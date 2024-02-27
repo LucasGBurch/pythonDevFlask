@@ -43,6 +43,15 @@ def get_task(id):
     return jsonify({"message": "Não foi possível encontrar a atividade"}), 404
 
 
+# EXEMPLO DE PARÂMETRO PARA ROTAS
+# @app.route('/user/<int:user_id>')
+# def show_user(user_id):
+#     print(user_id)
+#     print(type(user_id))
+#     # Formatando este retorno pra string, já que fizemos que a rota receba inteiros
+#     return "%s" % user_id
+
+
 # Garantir que subiremos o servidor dessa forma só se executarmos de forma manual.
 # Forma recomendada para desenvolvimento local (debug=True em vez de False, quando é em produção):
 if __name__ == "__main__":
