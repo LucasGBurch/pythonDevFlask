@@ -19,7 +19,7 @@ def create_task():
         "description", ""))  # Ou title=data['title'] na chave direto
     task_id_control += 1  # Contador para id básico nessa API
     tasks.append(new_task)
-    print(tasks)
+    # print(tasks)
     # Retorno em json, em vez da string direto
     return jsonify({"message": "Nova tarefa criada com sucesso."})
 
@@ -57,7 +57,9 @@ def update_task(id):
     for t in tasks:
         if t.id == id:
             task = t
-    print(task)
+            break  # Para não precisar seguir procurando quando encontrar, para não gastar processamento desnecessariamente e ter código mais performático
+
+    # print(task)
     if task == None:
         return jsonify({"message": "Não foi possível encontrar a atividade"}), 404
 
@@ -65,9 +67,26 @@ def update_task(id):
     task.title = data['title']
     task.description = data['description']
     task.completed = data['completed']
-    print(task)
-    # , 200 já é o padrão
+    # print(task)
+    # , 200, de sucesso da requisição, já é o padrão do jsonify
     return jsonify({"message": "Tarefa atualizada com sucesso."})
+
+
+@app.route('/tasks/<int:id>', methods=['DELETE'])
+def delete_task(id):
+    task = None
+    for t in tasks:
+        # print(task)
+        if t.id == id:
+            # Não remover diretamente com pop(), pois alteraria o tamanho da lista!
+            task = t
+            break  # Para não precisar seguir procurando quando encontrar, para não gastar processamento desnecessariamente e ter código mais performático
+
+    if not task:  # task == None
+        return jsonify({"message": "Não foi possível encontrar a atividade"}), 404
+
+    tasks.remove(task)
+    return jsonify({"message": "Tarefa deletada com sucesso."})
 
 
 # Garantir que subiremos o servidor dessa forma só se executarmos de forma manual.
