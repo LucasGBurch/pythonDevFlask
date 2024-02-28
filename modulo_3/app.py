@@ -42,7 +42,6 @@ def get_task(id):
     # Se não tiver nenhuma correspondência, retorna o erro:
     return jsonify({"message": "Não foi possível encontrar a atividade"}), 404
 
-
 # EXEMPLO DE PARÂMETRO PARA ROTAS
 # @app.route('/user/<int:user_id>')
 # def show_user(user_id):
@@ -50,6 +49,25 @@ def get_task(id):
 #     print(type(user_id))
 #     # Formatando este retorno pra string, já que fizemos que a rota receba inteiros
 #     return "%s" % user_id
+
+
+@app.route('/tasks/<int:id>', methods=['PUT'])
+def update_task(id):
+    task = None
+    for t in tasks:
+        if t.id == id:
+            task = t
+    print(task)
+    if task == None:
+        return jsonify({"message": "Não foi possível encontrar a atividade"}), 404
+
+    data = request.get_json()
+    task.title = data['title']
+    task.description = data['description']
+    task.completed = data['completed']
+    print(task)
+    # , 200 já é o padrão
+    return jsonify({"message": "Tarefa atualizada com sucesso."})
 
 
 # Garantir que subiremos o servidor dessa forma só se executarmos de forma manual.
