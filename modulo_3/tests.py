@@ -18,3 +18,20 @@ def test_create_task():
     assert "id" in response_json
     # Tipo assert response_json['id'] == 1, mas para qualquer criação
     tasks.append(response_json['id'])
+
+
+def test_get_tasks():
+    response = requests.get(f"{BASE_URL}/tasks")
+    assert response.status_code == 200
+    responnse_json = response.json()
+    assert "tasks" in responnse_json
+    assert "total_tasks" in responnse_json
+
+
+def test_get_task():
+    if tasks:
+        task_id = tasks[0]
+        response = requests.get(f"{BASE_URL}/tasks/{task_id}")
+        assert response.status_code == 200
+        response_json = response.json()
+        assert task_id == response_json['id']
