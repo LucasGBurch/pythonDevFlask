@@ -1,7 +1,7 @@
 from flask import Flask, request, jsonify
 from models.user import User
 from database import db
-from flask_login import LoginManager, login_user, current_user
+from flask_login import LoginManager, login_user, current_user, logout_user, login_required
 
 app = Flask(__name__)
 app.config['SECRET_KEY'] = "your_secret_key"
@@ -18,7 +18,7 @@ login_manager.login_view = 'login'
 
 @login_manager.user_loader
 def load_user(user_id):
-    return User.query.get(user_id)
+    return db.get_or_404(User, user_id)
 
 
 @app.route('/login', methods=["POST"])
@@ -29,15 +29,23 @@ def login():
 
     if username and password:
         # Login
-        user = User.query.filter_by(username=username).first()
-        # , 200 já é default
+        user = db.one_or_404(db.select(User).filter_by(
+            username=username), description=f"No user named {username}")
 
         if user and user.password == password:
             login_user(user)
             print(current_user.is_authenticated)
             return jsonify({"message": "Autenticação realizada com sucesso."})
+        # if user and user.password == password:
 
     return jsonify({"message": "Credenciais inválidas."}), 400
+
+
+@app.route('/logout', methods=["GET"])
+@login_required  # Para proteger a rota de quem não está autenticado
+def logout():
+    logout_user()
+    return jsonify({"message": "Logout realizado com sucesso!"})  # 200
 
 
 @app.route("/hello-world", methods=["GET"])
