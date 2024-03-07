@@ -12,13 +12,12 @@ db.init_app(app)
 login_manager.init_app(app)
 # view login
 login_manager.login_view = 'login'
-
 # Session <- conexão ativa
 
 
 @login_manager.user_loader
 def load_user(user_id):
-    return db.get_or_404(User, user_id)
+    return db.session.execute(db.select(User).filter_by(id=user_id)).scalar_one_or_none()
 
 
 @app.route('/login', methods=["POST"])
@@ -29,14 +28,13 @@ def login():
 
     if username and password:
         # Login
-        user = db.one_or_404(db.select(User).filter_by(
-            username=username), description=f"No user named {username}")
+        user = db.session.execute(db.select(User).filter_by(
+            username=username)).scalar_one_or_none()
 
         if user and user.password == password:
             login_user(user)
             print(current_user.is_authenticated)
-            return jsonify({"message": "Autenticação realizada com sucesso."})
-        # if user and user.password == password:
+        return jsonify({"message": "Autenticação realizada com sucesso."})
 
     return jsonify({"message": "Credenciais inválidas."}), 400
 
