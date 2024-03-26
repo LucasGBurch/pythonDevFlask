@@ -17,7 +17,7 @@ login_manager.login_view = 'login'
 
 @login_manager.user_loader
 def load_user(user_id):
-    return db.session.execute(db.select(User).filter_by(id=user_id)).scalar_one_or_none()
+    return db.session.query(User).filter_by(id=user_id).one_or_none()
 
 
 @app.route('/login', methods=["POST"])
@@ -28,8 +28,7 @@ def login():
 
     if username and password:
         # Login
-        user = db.session.execute(db.select(User).filter_by(
-            username=username)).scalar_one_or_none()
+        user = User.query.filter_by(username=username).first()
 
         if user and user.password == password:
             login_user(user)
