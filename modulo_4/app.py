@@ -33,7 +33,7 @@ def login():
         if user and user.password == password:
             login_user(user)
             print(current_user.is_authenticated)
-        return jsonify({"message": "Autenticação realizada com sucesso."})
+            return jsonify({"message": "Autenticação realizada com sucesso."})
 
     return jsonify({"message": "Credenciais inválidas."}), 400
 
@@ -59,6 +59,44 @@ def create_user():
         return jsonify({"message": "Usuário cadastrado com sucesso"}), 200
 
     return jsonify({"message": "Dados inválidos"}), 401
+
+
+@app.route('/user/<int:id_user>', methods=["GET"])
+@login_required
+def read_user(id_user):
+    user = User.query.get(id_user)
+
+    if user:
+        return {"username": user.username}
+
+    return jsonify({"message": "Usuário não encontrado"}), 404
+
+
+@app.route('/user/<int:id_user>', methods=["PUT"])
+@login_required
+def update_user(id_user):
+    data = request.json
+    user = User.query.get(id_user)
+
+    if user and data.get("password"):
+        # Não é recomendado atualizar username, pois as outras requisições vão usá-lo
+        user.password = data.get("password")
+        db.session.commit()
+
+        return jsonify({"message": f"Usuário {id_user} atualizado com sucesso"})
+
+    return jsonify({"message": "Usuário não encontrado"}), 404
+
+
+@app.route('/user/<int:id_user>', methods=["DELETE"])
+@login_required
+def delete_user(id_user):
+    user = User.query.get(id_user)
+
+    if user:
+        return jsonify({"message": f"Usuário {id_user} deletado com sucesso"})
+
+    return jsonify({"message": "Usuário não encontrado"}), 404
 
 
 @app.route("/hello-world", methods=["GET"])
